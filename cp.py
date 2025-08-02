@@ -4,10 +4,8 @@ import shutil
 import xml.etree.ElementTree as ET
 
 def get_base_dir():
-    # 如果是打包后的 exe，用 exe 所在目录
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable)
-    # 普通脚本，用脚本所在目录
     return os.path.dirname(os.path.abspath(__file__))
 
 def replace_in_xml(file_path, old_name, new_name):
@@ -42,16 +40,19 @@ def create_project(project_name):
         input("Press Enter to exit...")
         return
 
+    # 复制模板目录
     shutil.copytree(template_dir, target_dir)
 
     old_name = os.path.basename(template_dir)
 
+    # 修改 .idea 配置
     idea_dir = os.path.join(target_dir, ".idea")
     name_file = os.path.join(idea_dir, ".name")
     if os.path.exists(name_file):
         with open(name_file, "w", encoding="utf-8") as f:
             f.write(project_name)
 
+    # 重命名 .iml 文件
     for file in os.listdir(idea_dir):
         if file.endswith(".iml") and old_name in file:
             old_path = os.path.join(idea_dir, file)
@@ -59,8 +60,15 @@ def create_project(project_name):
             new_path = os.path.join(idea_dir, new_file)
             os.rename(old_path, new_path)
 
+    # 替换 .idea 配置文件中的旧项目名
     replace_in_xml(os.path.join(idea_dir, "workspace.xml"), old_name, project_name)
     replace_in_xml(os.path.join(idea_dir, "misc.xml"), old_name, project_name)
+    replace_in_xml(os.path.join(idea_dir, "modules.xml"), old_name, project_name)
+
+    # 替换所有 .iml 文件中的内容
+    for file in os.listdir(idea_dir):
+        if file.endswith(".iml"):
+            replace_in_xml(os.path.join(idea_dir, file), old_name, project_name)
 
     print(f"Project '{project_name}' created at: {target_dir}")
     input("Press Enter to exit...")

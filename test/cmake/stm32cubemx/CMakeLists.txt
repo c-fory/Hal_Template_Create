@@ -22,6 +22,10 @@ set(MX_Include_Dirs
 set(MX_Application_Src
     ${CMAKE_SOURCE_DIR}/startup_stm32f103xb.s
 	${CMAKE_SOURCE_DIR}/Core/Src/main.c
+	${CMAKE_SOURCE_DIR}/Core/Src/stm32f1xx_it.c
+	${CMAKE_SOURCE_DIR}/Core/Src/stm32f1xx_hal_msp.c
+	${CMAKE_SOURCE_DIR}/Core/Src/sysmem.c
+	${CMAKE_SOURCE_DIR}/Core/Src/syscalls.c
 )
 
 # STM32 HAL/LL Drivers
